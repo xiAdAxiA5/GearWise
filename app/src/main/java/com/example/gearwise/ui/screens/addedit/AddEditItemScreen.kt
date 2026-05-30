@@ -234,7 +234,7 @@ fun AddEditItemScreen(
                         appendLine("· 请选择出售日期")
                     }
                     if (formState.isSold && formState.soldDate != null &&
-                        formState.soldDate < formState.purchaseDate
+                        (formState.soldDate ?: 0L) < formState.purchaseDate
                     ) {
                         appendLine("· 出售日期不能早于购买日期")
                     }
