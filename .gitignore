@@ -1,0 +1,62 @@
+# ===== Android =====
+*.apk
+*.aab
+*.dex
+*.class
+*.log
+*.tmp
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.jar
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+.navigation/
+captures/
+externalNativeBuild/
+
+# ===== Secrets & Signing (never commit) =====
+local.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.cer
+*.crt
+*.pem
+keystore.properties
+signing.properties
+secrets.properties
+google-services.json
+GoogleService-Info.plist
+.env
+.env.*
+.envrc
+*.cred
+*_credentials.json
+
+# ===== OS generated =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ===== Misc =====
+*.swp
+*.swo
+*~
+~$*
+*.orig
+.vscode/
+*.sublime-*
+node_modules/
