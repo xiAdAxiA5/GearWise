@@ -27,6 +27,7 @@ import com.example.gearwise.util.DateUtils.formatCurrency
 fun ItemListScreen(
     onItemClick: (Long) -> Unit,
     onAddClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: ItemListViewModel = viewModel()
 ) {
     val items by viewModel.items.collectAsState()
@@ -35,6 +36,11 @@ fun ItemListScreen(
         topBar = {
             TopAppBar(
                 title = { Text("GearWise", fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "设置")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,

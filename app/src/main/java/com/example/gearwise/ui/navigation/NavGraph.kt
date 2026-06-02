@@ -10,11 +10,13 @@ import androidx.navigation.navArgument
 import com.example.gearwise.ui.screens.addedit.AddEditItemScreen
 import com.example.gearwise.ui.screens.detail.ItemDetailScreen
 import com.example.gearwise.ui.screens.list.ItemListScreen
+import com.example.gearwise.ui.screens.settings.SettingsScreen
 
 object Routes {
     const val LIST = "list"
     const val DETAIL = "detail/{itemId}"
     const val ADD_EDIT = "addedit?itemId={itemId}"
+    const val SETTINGS = "settings"
 
     fun detail(itemId: Long) = "detail/$itemId"
     fun addEdit(itemId: Long? = null) = if (itemId != null) "addedit?itemId=$itemId" else "addedit"
@@ -32,7 +34,8 @@ fun GearWiseNavGraph(
         composable(Routes.LIST) {
             ItemListScreen(
                 onItemClick = { itemId -> navController.navigate(Routes.detail(itemId)) },
-                onAddClick = { navController.navigate(Routes.addEdit()) }
+                onAddClick = { navController.navigate(Routes.addEdit()) },
+                onSettingsClick = { navController.navigate(Routes.SETTINGS) }
             )
         }
 
@@ -67,6 +70,13 @@ fun GearWiseNavGraph(
                 itemId = if (itemId == -1L) null else itemId,
                 onBackClick = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() }
+            )
+        }
+
+        // 设置
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
     }
