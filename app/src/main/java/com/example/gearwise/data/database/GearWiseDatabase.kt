@@ -4,17 +4,32 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.gearwise.data.dao.ElectronicItemDao
-import com.example.gearwise.data.model.ElectronicItem
+import com.example.gearwise.data.dao.*
+import com.example.gearwise.data.model.*
 
 @Database(
-    entities = [ElectronicItem::class],
-    version = 1,
+    entities = [
+        ElectronicItem::class,
+        CountdownEvent::class,
+        Birthday::class,
+        Habit::class,
+        HabitRecord::class,
+        DiaryEntry::class,
+        Subscription::class,
+        Plan::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class GearWiseDatabase : RoomDatabase() {
 
     abstract fun electronicItemDao(): ElectronicItemDao
+    abstract fun countdownDao(): CountdownDao
+    abstract fun birthdayDao(): BirthdayDao
+    abstract fun habitDao(): HabitDao
+    abstract fun diaryDao(): DiaryDao
+    abstract fun subscriptionDao(): SubscriptionDao
+    abstract fun planDao(): PlanDao
 
     companion object {
         @Volatile
@@ -26,7 +41,9 @@ abstract class GearWiseDatabase : RoomDatabase() {
                     context.applicationContext,
                     GearWiseDatabase::class.java,
                     "gearwise_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }
