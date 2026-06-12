@@ -319,8 +319,7 @@ private fun CategoryDropdown(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
-            shape = RoundedCornerShape(4.dp)
+            onDismissRequest = { expanded = false }
         ) {
             categories.forEach { category ->
                 DropdownMenuItem(

@@ -135,7 +135,7 @@ private fun SummaryBar(
 @Composable
 private fun SummaryChip(label: String, value: String) {
     Row(
-        verticalAlignment = Alignment.Baseline,
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
