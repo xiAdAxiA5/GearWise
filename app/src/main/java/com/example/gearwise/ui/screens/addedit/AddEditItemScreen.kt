@@ -1,11 +1,13 @@
 package com.example.gearwise.ui.screens.addedit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,8 +17,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gearwise.util.DateUtils
-import java.text.NumberFormat
-import java.util.*
 
 private val categories = listOf("手机", "电脑", "平板", "耳机", "其他")
 
@@ -32,14 +32,22 @@ fun AddEditItemScreen(
     var showError by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (viewModel.isEditing) "编辑设备" else "添加设备")
+                    Text(
+                        if (viewModel.isEditing) "编辑设备" else "添加设备",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(
+                            Icons.Outlined.ArrowBack,
+                            contentDescription = "返回",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 },
                 actions = {
@@ -52,9 +60,16 @@ fun AddEditItemScreen(
                             }
                         }
                     ) {
-                        Text("保存", fontWeight = FontWeight.Bold)
+                        Text(
+                            "保存",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
@@ -63,106 +78,109 @@ fun AddEditItemScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             // ===== 基本信息 =====
-            SectionHeader("基本信息")
+            SectionLabel("基本信息")
 
-            // 名称
             OutlinedTextField(
                 value = formState.name,
                 onValueChange = viewModel::updateName,
-                label = { Text("名称 *") },
-                placeholder = { Text("例如：iPhone 15 Pro") },
+                label = { Text("名称") },
+                placeholder = { Text("例如：iPhone 15 Pro", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 分类下拉
             CategoryDropdown(
                 selectedCategory = formState.category,
                 onCategorySelected = viewModel::updateCategory,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 品牌
             OutlinedTextField(
                 value = formState.brand,
                 onValueChange = viewModel::updateBrand,
                 label = { Text("品牌") },
-                placeholder = { Text("例如：Apple") },
+                placeholder = { Text("例如：Apple", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 型号
             OutlinedTextField(
                 value = formState.model,
                 onValueChange = viewModel::updateModel,
                 label = { Text("型号") },
-                placeholder = { Text("例如：A2848") },
+                placeholder = { Text("例如：A2848", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // ===== 购买信息 =====
-            SectionHeader("购买信息")
+            SectionLabel("购买信息")
 
-            // 购买日期
             DatePickerField(
-                label = "购买日期 *",
+                label = "购买日期",
                 selectedDateMillis = formState.purchaseDate,
                 onDateSelected = viewModel::updatePurchaseDate,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 购买价格
             OutlinedTextField(
                 value = formState.purchasePrice,
                 onValueChange = viewModel::updatePurchasePrice,
-                label = { Text("购买价格 (¥) *") },
-                placeholder = { Text("0") },
+                label = { Text("购买价格 (¥)") },
+                placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                prefix = { Text("¥ ") },
+                prefix = { Text("¥ ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 配件支出
             OutlinedTextField(
                 value = formState.accessoryCost,
                 onValueChange = viewModel::updateAccessoryCost,
                 label = { Text("配件支出 (¥)") },
-                placeholder = { Text("0") },
+                placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                prefix = { Text("¥ ") },
+                prefix = { Text("¥ ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 supportingText = { Text("保护壳、贴膜、充电器等") },
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 维修支出
             OutlinedTextField(
                 value = formState.repairCost,
                 onValueChange = viewModel::updateRepairCost,
                 label = { Text("维修支出 (¥)") },
-                placeholder = { Text("0") },
+                placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                prefix = { Text("¥ ") },
+                prefix = { Text("¥ ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 supportingText = { Text("换屏、换电池、维修费等") },
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // ===== 出售信息 =====
-            SectionHeader("出售信息")
+            SectionLabel("出售信息")
 
-            // 是否已出售开关
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -170,18 +188,24 @@ fun AddEditItemScreen(
             ) {
                 Text(
                     text = "是否已出售",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Switch(
                     checked = formState.isSold,
-                    onCheckedChange = viewModel::updateIsSold
+                    onCheckedChange = viewModel::updateIsSold,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = MaterialTheme.colorScheme.background,
+                        checkedTrackColor = MaterialTheme.colorScheme.onSurface,
+                        uncheckedThumbColor = MaterialTheme.colorScheme.background,
+                        uncheckedTrackColor = MaterialTheme.colorScheme.outline
+                    )
                 )
             }
 
-            // 已出售时显示出售日期和出售价格
             if (formState.isSold) {
                 DatePickerField(
-                    label = "出售日期 *",
+                    label = "出售日期",
                     selectedDateMillis = formState.soldDate,
                     onDateSelected = viewModel::updateSoldDate,
                     modifier = Modifier.fillMaxWidth()
@@ -191,10 +215,12 @@ fun AddEditItemScreen(
                     value = formState.soldPrice,
                     onValueChange = viewModel::updateSoldPrice,
                     label = { Text("出售价格 (¥)") },
-                    placeholder = { Text("0") },
+                    placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    prefix = { Text("¥ ") },
+                    prefix = { Text("¥ ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    shape = RoundedCornerShape(4.dp),
+                    colors = outlinedFieldColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -202,27 +228,29 @@ fun AddEditItemScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // ===== 备注 =====
-            SectionHeader("备注")
+            SectionLabel("备注")
 
             OutlinedTextField(
                 value = formState.notes,
                 onValueChange = viewModel::updateNotes,
                 label = { Text("备注") },
-                placeholder = { Text("使用感受、购买原因等...") },
+                placeholder = { Text("使用感受、购买原因等...", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                 minLines = 3,
                 maxLines = 5,
+                shape = RoundedCornerShape(4.dp),
+                colors = outlinedFieldColors(),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 底部留白
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 
-    // 错误提示
     if (showError) {
         AlertDialog(
             onDismissRequest = { showError = false },
+            shape = RoundedCornerShape(4.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("信息不完整") },
             text = {
                 Text(buildString {
@@ -242,25 +270,24 @@ fun AddEditItemScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showError = false }) {
-                    Text("知道了")
+                    Text("知道了", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         )
     }
 }
 
-// ===== 可复用组件 =====
+// ===== Reusable Components =====
 
 @Composable
-private fun SectionHeader(title: String) {
+private fun SectionLabel(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = 8.dp)
+        fontWeight = FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
     )
-    HorizontalDivider()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -281,8 +308,10 @@ private fun CategoryDropdown(
             value = selectedCategory,
             onValueChange = {},
             readOnly = true,
-            label = { Text("类型 *") },
+            label = { Text("类型") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            shape = RoundedCornerShape(4.dp),
+            colors = outlinedFieldColors(),
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor()
@@ -290,7 +319,8 @@ private fun CategoryDropdown(
 
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            shape = RoundedCornerShape(4.dp)
         ) {
             categories.forEach { category ->
                 DropdownMenuItem(
@@ -320,16 +350,18 @@ private fun DatePickerField(
         onValueChange = {},
         label = { Text(label) },
         readOnly = true,
-        modifier = modifier,
+        shape = RoundedCornerShape(4.dp),
+        colors = outlinedFieldColors(),
         trailingIcon = {
             IconButton(onClick = { showDialog = true }) {
-                Icon(Icons.Default.DateRange, contentDescription = "选择日期")
+                Icon(
+                    Icons.Outlined.DateRange,
+                    contentDescription = "选择日期",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-        )
+        modifier = modifier
     )
 
     if (showDialog) {
@@ -344,16 +376,28 @@ private fun DatePickerField(
                     datePickerState.selectedDateMillis?.let { onDateSelected(it) }
                     showDialog = false
                 }) {
-                    Text("确定")
+                    Text("确定", color = MaterialTheme.colorScheme.onSurface)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text("取消")
+                    Text("取消", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-            }
+            },
+            shape = RoundedCornerShape(4.dp)
         ) {
             DatePicker(state = datePickerState)
         }
     }
 }
+
+@Composable
+private fun outlinedFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    focusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    cursorColor = MaterialTheme.colorScheme.onSurface
+)

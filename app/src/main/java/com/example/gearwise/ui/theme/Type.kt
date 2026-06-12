@@ -7,64 +7,61 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 val AppTypography = Typography(
-    displayLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        lineHeight = 40.sp
-    ),
+    // Large device name on detail screen
     headlineLarge = TextStyle(
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 36.sp
+        fontSize = 26.sp,
+        lineHeight = 34.sp,
+        letterSpacing = (-0.3).sp
     ),
+    // Page titles
     headlineMedium = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp
-    ),
-    titleLarge = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
         lineHeight = 28.sp
     ),
+    // Card titles (device name in list)
     titleMedium = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
+        fontSize = 17.sp,
         lineHeight = 24.sp
     ),
+    // Section headers
     titleSmall = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.5.sp
     ),
+    // Body / labels
     bodyLarge = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp
+        fontSize = 15.sp,
+        lineHeight = 22.sp
     ),
     bodyMedium = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp
     ),
+    // Secondary info
     bodySmall = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
+        fontSize = 13.sp,
+        lineHeight = 18.sp
     ),
+    // Cost numbers — tabular figures for alignment
     labelLarge = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp
+        fontSize = 15.sp,
+        lineHeight = 22.sp,
+        fontFamily = FontFamily.Default
     ),
-    labelMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp
-    ),
+    // Tiny labels
     labelSmall = TextStyle(
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 11.sp,
-        lineHeight = 16.sp
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
     )
 )

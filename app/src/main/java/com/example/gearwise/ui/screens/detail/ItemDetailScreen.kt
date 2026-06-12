@@ -1,10 +1,12 @@
 package com.example.gearwise.ui.screens.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,10 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gearwise.data.model.ElectronicItem
-import com.example.gearwise.ui.screens.list.categoryColor
 import com.example.gearwise.ui.screens.list.categoryIcon
-import com.example.gearwise.ui.theme.statusInUse
-import com.example.gearwise.ui.theme.statusSold
 import com.example.gearwise.util.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,26 +36,38 @@ fun ItemDetailScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(item?.name ?: "设备详情") },
+                title = { Text("") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "返回")
+                        Icon(
+                            Icons.Outlined.ArrowBack,
+                            contentDescription = "返回",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 },
                 actions = {
                     IconButton(onClick = onEditClick) {
-                        Icon(Icons.Default.Edit, contentDescription = "编辑")
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = "编辑",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                     IconButton(onClick = { showDeleteDialog = true }) {
                         Icon(
-                            Icons.Default.Delete,
+                            Icons.Outlined.Delete,
                             contentDescription = "删除",
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
             )
         }
     ) { padding ->
@@ -67,86 +78,67 @@ fun ItemDetailScreen(
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
             ) {
-                // 头部信息
+                // 头部
                 DetailHeader(item = currentItem)
 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-
                 // 购买信息
-                SectionTitle("购买信息")
-                DetailRow("购买日期", DateUtils.formatDate(currentItem.purchaseDate))
-                DetailRow("购买价格", DateUtils.formatCurrency(currentItem.purchasePrice))
-                DetailRow("配件支出", DateUtils.formatCurrency(currentItem.accessoryCost))
-                DetailRow("维修支出", DateUtils.formatCurrency(currentItem.repairCost))
-
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-
-                // 处置信息
-                SectionTitle("处置信息")
-                if (currentItem.isSold) {
-                    DetailRow("状态", "已出售")
-                    DetailRow(
-                        "出售日期",
-                        currentItem.soldDate?.let { DateUtils.formatDate(it) } ?: "-"
-                    )
-                    DetailRow(
-                        "出售价格",
-                        currentItem.soldPrice?.let { DateUtils.formatCurrency(it) } ?: "-"
-                    )
-                } else {
-                    DetailRow("状态", "仍在用")
+                SectionBlock("购买信息") {
+                    DetailRow("购买日期", DateUtils.formatDate(currentItem.purchaseDate))
+                    DetailRow("购买价格", DateUtils.formatCurrency(currentItem.purchasePrice))
+                    DetailRow("配件支出", DateUtils.formatCurrency(currentItem.accessoryCost))
+                    DetailRow("维修支出", DateUtils.formatCurrency(currentItem.repairCost))
                 }
 
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                // 处置信息
+                SectionBlock("处置信息") {
+                    if (currentItem.isSold) {
+                        DetailRow("状态", "已出售")
+                        DetailRow("出售日期", currentItem.soldDate?.let { DateUtils.formatDate(it) } ?: "-")
+                        DetailRow("出售价格", currentItem.soldPrice?.let { DateUtils.formatCurrency(it) } ?: "-")
+                    } else {
+                        DetailRow("状态", "仍在用")
+                    }
+                }
 
                 // 成本分析
-                SectionTitle("成本分析")
-                DetailRow("持有天数", "${currentItem.daysHeld} 天")
-                DetailRow(
-                    "实际持有成本",
-                    DateUtils.formatCurrency(currentItem.totalCost),
-                    highlight = true
-                )
-                DetailRow(
-                    "日均成本",
-                    DateUtils.formatCurrency(currentItem.dailyCost),
-                    highlight = true
-                )
-                DetailRow(
-                    "月均成本",
-                    DateUtils.formatCurrency(currentItem.monthlyCost)
-                )
+                SectionBlock("成本分析") {
+                    DetailRow("持有天数", "${currentItem.daysHeld} 天")
+                    DetailRow("实际持有成本", DateUtils.formatCurrency(currentItem.totalCost), highlight = true)
+                    DetailRow("日均成本", DateUtils.formatCurrency(currentItem.dailyCost), highlight = true)
+                    DetailRow("月均成本", DateUtils.formatCurrency(currentItem.monthlyCost))
+                }
 
                 // 备注
                 if (currentItem.notes.isNotBlank()) {
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                    SectionTitle("备注")
-                    Text(
-                        text = currentItem.notes,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+                    SectionBlock("备注") {
+                        Text(
+                            text = currentItem.notes,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(40.dp))
             }
         } ?: run {
-            // Loading state
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 
-    // 删除确认对话框
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
+            shape = RoundedCornerShape(4.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("确认删除") },
             text = { Text("删除后无法恢复，确定要删除「${item?.name}」吗？") },
             confirmButton = {
@@ -154,17 +146,14 @@ fun ItemDetailScreen(
                     onClick = {
                         showDeleteDialog = false
                         viewModel.deleteItem(onDeleted)
-                    },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    }
                 ) {
-                    Text("删除")
+                    Text("删除", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("取消")
+                    Text("取消", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         )
@@ -176,34 +165,26 @@ private fun DetailHeader(item: ElectronicItem) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 20.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 分类图标
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = categoryColor(item.category).copy(alpha = 0.15f),
-            modifier = Modifier.size(64.dp)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = categoryIcon(item.category),
-                    contentDescription = item.category,
-                    tint = categoryColor(item.category),
-                    modifier = Modifier.size(36.dp)
-                )
-            }
-        }
+        Icon(
+            imageVector = categoryIcon(item.category),
+            contentDescription = item.category,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(40.dp)
+        )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = item.name,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = "${item.brand} · ${item.model} · ${item.category}",
@@ -211,34 +192,39 @@ private fun DetailHeader(item: ElectronicItem) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // 状态标签
-        Surface(
-            shape = MaterialTheme.shapes.small,
-            color = if (item.isSold) statusSold.copy(alpha = 0.15f)
-            else statusInUse.copy(alpha = 0.15f)
-        ) {
-            Text(
-                text = if (item.isSold) "已出售" else "仍在用",
-                style = MaterialTheme.typography.labelMedium,
-                color = if (item.isSold) statusSold else statusInUse,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-            )
-        }
+        Text(
+            text = if (item.isSold) "已出售" else "仍在用",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
-private fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
-    )
+private fun SectionBlock(
+    title: String,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+        Spacer(modifier = Modifier.height(14.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        content()
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 }
 
 @Composable
@@ -250,7 +236,7 @@ private fun DetailRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(vertical = 5.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -262,9 +248,8 @@ private fun DetailRow(
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (highlight) FontWeight.Bold else FontWeight.Normal,
-            color = if (highlight) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurface
+            fontWeight = if (highlight) FontWeight.SemiBold else FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

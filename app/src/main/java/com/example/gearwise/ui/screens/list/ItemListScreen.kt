@@ -1,11 +1,13 @@
 package com.example.gearwise.ui.screens.list
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -18,7 +20,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.gearwise.data.model.ElectronicItem
-import com.example.gearwise.ui.theme.*
 import com.example.gearwise.util.DateUtils
 import com.example.gearwise.util.DateUtils.formatCurrency
 
@@ -33,32 +34,43 @@ fun ItemListScreen(
     val items by viewModel.items.collectAsState()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text("GearWise", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "GearWise",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, contentDescription = "设置")
+                        Icon(
+                            Icons.Outlined.Settings,
+                            contentDescription = "设置",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddClick,
-                containerColor = MaterialTheme.colorScheme.primary
+                shape = RoundedCornerShape(4.dp),
+                containerColor = MaterialTheme.colorScheme.onBackground,
+                contentColor = MaterialTheme.colorScheme.background,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "添加设备")
+                Icon(Icons.Outlined.Add, contentDescription = "添加设备")
             }
         }
     ) { padding ->
         if (items.isEmpty()) {
-            // 空状态
             EmptyState(
                 modifier = Modifier
                     .fillMaxSize()
@@ -80,15 +92,17 @@ fun ItemListScreen(
 
                 // 设备列表
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    item { Spacer(modifier = Modifier.height(0.dp)) }
                     items(items, key = { it.id }) { item ->
                         ItemCard(
                             item = item,
                             onClick = { onItemClick(item.id) }
                         )
                     }
+                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
         }
@@ -101,38 +115,39 @@ private fun SummaryBar(
     activeCount: Int,
     grandTotalCost: Double
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        tonalElevation = 2.dp
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SummaryChip(label = "总计", value = "${totalItems}件")
-            SummaryChip(label = "在用", value = "${activeCount}件")
-            SummaryChip(label = "总成本", value = formatCurrency(grandTotalCost))
-        }
+        SummaryChip(label = "总计", value = "${totalItems}件")
+        SummaryChip(label = "在用", value = "${activeCount}件")
+        SummaryChip(label = "总成本", value = formatCurrency(grandTotalCost))
     }
+    HorizontalDivider(
+        thickness = 0.5.dp,
+        color = MaterialTheme.colorScheme.outline,
+        modifier = Modifier.padding(horizontal = 16.dp)
+    )
 }
 
 @Composable
 private fun SummaryChip(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Row(
+        verticalAlignment = Alignment.Baseline,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
         Text(
             text = value,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -146,66 +161,59 @@ private fun ItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
             // 第一行：图标 + 名称 + 状态
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // 分类图标
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = categoryColor(item.category).copy(alpha = 0.15f),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = categoryIcon(item.category),
-                            contentDescription = item.category,
-                            tint = categoryColor(item.category),
-                            modifier = Modifier.size(22.dp)
-                        )
-                    }
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = categoryIcon(item.category),
+                    contentDescription = item.category,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp)
+                )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "${DateUtils.formatDate(item.purchaseDate)} · ${item.brand}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
 
-                // 状态标签
-                Surface(
-                    shape = MaterialTheme.shapes.small,
-                    color = if (item.isSold) statusSold.copy(alpha = 0.15f) else statusInUse.copy(alpha = 0.15f)
-                ) {
-                    Text(
-                        text = if (item.isSold) "已出售" else "在用",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (item.isSold) statusSold else statusInUse,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
+                Text(
+                    text = if (item.isSold) "已售" else "在用",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // 第二行：日期 + 品牌
+            Text(
+                text = "${DateUtils.formatDate(item.purchaseDate)} · ${item.brand}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 34.dp)
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outline
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             // 第三行：成本数据
             Row(
@@ -213,9 +221,13 @@ private fun ItemCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 CostItem(label = "购买价", value = formatCurrency(item.purchasePrice))
-                CostItem(label = "持有天数", value = "${item.daysHeld}天")
+                CostItem(label = "持有", value = "${item.daysHeld}天")
                 CostItem(label = "实际成本", value = formatCurrency(item.totalCost))
-                CostItem(label = "日均成本", value = formatCurrency(item.dailyCost), highlight = true)
+                CostItem(
+                    label = "日均",
+                    value = formatCurrency(item.dailyCost),
+                    highlight = true
+                )
             }
         }
     }
@@ -231,9 +243,8 @@ private fun CostItem(
         Text(
             text = value,
             style = MaterialTheme.typography.labelLarge,
-            fontWeight = if (highlight) FontWeight.Bold else FontWeight.Medium,
-            color = if (highlight) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurface
+            fontWeight = if (highlight) FontWeight.SemiBold else FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             text = label,
@@ -254,12 +265,12 @@ private fun EmptyState(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.DevicesOther,
+            imageVector = Icons.Outlined.DevicesOther,
             contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "还没有记录任何设备",
             style = MaterialTheme.typography.titleMedium,
@@ -269,35 +280,32 @@ private fun EmptyState(
         Text(
             text = "点击下方按钮添加你的第一台设备",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
         )
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = onAddClick) {
-            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.height(28.dp))
+        OutlinedButton(
+            onClick = onAddClick,
+            shape = RoundedCornerShape(4.dp),
+            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+        ) {
+            Icon(
+                Icons.Outlined.Add,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
             Text("添加设备")
         }
     }
 }
 
-/** 分类对应的图标 */
+/** 分类图标 — 全部 Outlined 描边风格 */
 fun categoryIcon(category: String): ImageVector {
     return when (category) {
-        "手机" -> Icons.Default.Smartphone
-        "电脑" -> Icons.Default.Laptop
-        "平板" -> Icons.Default.TabletAndroid
-        "耳机" -> Icons.Default.Headphones
-        else -> Icons.Default.DevicesOther
-    }
-}
-
-/** 分类对应的颜色 */
-fun categoryColor(category: String): androidx.compose.ui.graphics.Color {
-    return when (category) {
-        "手机" -> categoryPhone
-        "电脑" -> categoryComputer
-        "平板" -> categoryTablet
-        "耳机" -> categoryHeadphone
-        else -> categoryOther
+        "手机" -> Icons.Outlined.Smartphone
+        "电脑" -> Icons.Outlined.Laptop
+        "平板" -> Icons.Outlined.TabletAndroid
+        "耳机" -> Icons.Outlined.Headphones
+        else -> Icons.Outlined.DevicesOther
     }
 }
