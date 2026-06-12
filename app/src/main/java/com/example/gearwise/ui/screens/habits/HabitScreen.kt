@@ -27,6 +27,7 @@ import com.example.gearwise.data.model.HabitRecord
 import com.example.gearwise.ui.components.IconPickerDialog
 import com.example.gearwise.ui.components.getIconByName
 import com.example.gearwise.util.DateUtils
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -49,17 +50,13 @@ class HabitViewModel(app: Application) : AndroidViewModel(app) {
 
     fun isCompletedToday(habitId: Long): StateFlow<Boolean> {
         val today = DateUtils.todayTimestamp()
-        return dao.getRecordsForHabit(habitId).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-            .let { flow ->
-                // Simple StateFlow mapping: check if today's record exists and is completed
-                val result = MutableStateFlow(false)
-                viewModelScope.launch {
-                    flow.collect { records ->
-                        result.value = records.any { it.date == today && it.isCompleted }
-                    }
-                }
-                result
+        val result = MutableStateFlow(false)
+        viewModelScope.launch {
+            dao.getRecordsForHabit(habitId).collect { records ->
+                result.value = records.any { it.date == today && it.isCompleted }
             }
+        }
+        return result
     }
 
     fun save(habit: Habit, onDone: () -> Unit) = viewModelScope.launch {
