@@ -42,145 +42,110 @@ val bottomNavItems = listOf(
 
 @Composable
 fun GearWiseNavGraph() {
-    val rootNavController = rememberNavController()
+    val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val showBottomBar = currentRoute in bottomNavItems.map { it.route } || currentRoute == "settings"
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                tonalElevation = 0.dp
-            ) {
-                val currentRoute = rootNavController.currentBackStackEntryAsState().value?.destination?.route
-                bottomNavItems.forEach { item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label, modifier = Modifier.size(20.dp)) },
-                        label = {
-                            Text(
-                                item.label,
-                                style = MaterialTheme.typography.labelSmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Visible
-                            )
-                        },
-                        selected = currentRoute == item.route,
-                        onClick = {
-                            if (currentRoute != item.route) {
-                                rootNavController.navigate(item.route) {
-                                    popUpTo(rootNavController.graph.startDestinationId) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
+            if (showBottomBar) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    tonalElevation = 0.dp
+                ) {
+                    bottomNavItems.forEach { item ->
+                        NavigationBarItem(
+                            icon = { Icon(item.icon, contentDescription = item.label, modifier = Modifier.size(20.dp)) },
+                            label = { Text(item.label, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Visible) },
+                            selected = currentRoute == item.route,
+                            onClick = {
+                                if (currentRoute != item.route) {
+                                    navController.navigate(item.route) {
+                                        popUpTo("devices") { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            indicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
-                        ),
-                        modifier = Modifier.padding(vertical = 0.dp)
-                    )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                indicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)
+                            )
+                        )
+                    }
                 }
             }
         }
     ) { innerPadding ->
         NavHost(
-            navController = rootNavController,
+            navController = navController,
             startDestination = "devices",
             modifier = Modifier.padding(innerPadding)
         ) {
-            // === 设备 ===
+            // === 设备列表 ===
             composable("devices") {
-                DeviceNavHost(
-                    onSettingsClick = { rootNavController.navigate("settings") }
+                ItemListScreen(
+                    onItemClick = { id -> navController.navigate("device_detail/$id") },
+                    onAddClick = { navController.navigate("device_add") },
+                    onSettingsClick = { navController.navigate("settings") }
+                )
+            }
+
+            // === 设备详情 ===
+            composable("device_detail/{itemId}", arguments = listOf(navArgument("itemId") { type = NavType.LongType })) { entry ->
+                val id = entry.arguments?.getLong("itemId") ?: return@composable
+                ItemDetailScreen(
+                    itemId = id,
+                    onBackClick = { navController.popBackStack() },
+                    onEditClick = { navController.navigate("device_edit/$id") },
+                    onDeleted = { navController.popBackStack("devices", false) }
+                )
+            }
+
+            // === 设备添加/编辑 ===
+            composable("device_add?itemId={itemId}", arguments = listOf(navArgument("itemId") { type = NavType.LongType; defaultValue = -1L })) { entry ->
+                val id = entry.arguments?.getLong("itemId") ?: -1L
+                AddEditItemScreen(
+                    itemId = if (id == -1L) null else id,
+                    onBackClick = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() }
+                )
+            }
+            composable("device_edit/{itemId}", arguments = listOf(navArgument("itemId") { type = NavType.LongType })) { entry ->
+                val id = entry.arguments?.getLong("itemId") ?: return@composable
+                AddEditItemScreen(
+                    itemId = id,
+                    onBackClick = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() }
                 )
             }
 
             // === 计时 ===
-            composable("countdown") {
-                CountdownScreen()
-            }
+            composable("countdown") { CountdownScreen() }
 
             // === 生日 ===
-            composable("birthdays") {
-                BirthdayScreen()
-            }
+            composable("birthdays") { BirthdayScreen() }
 
             // === 打卡 ===
-            composable("habits") {
-                HabitScreen()
-            }
+            composable("habits") { HabitScreen() }
 
             // === 日记 ===
-            composable("diary") {
-                DiaryScreen()
-            }
+            composable("diary") { DiaryScreen() }
 
             // === 订阅 ===
-            composable("subscriptions") {
-                SubscriptionScreen()
-            }
+            composable("subscriptions") { SubscriptionScreen() }
 
             // === 计划 ===
-            composable("plans") {
-                PlanScreen()
-            }
+            composable("plans") { PlanScreen() }
 
-            // === 设置 (不在 bottom nav 中) ===
-            composable("settings") {
-                SettingsScreen(
-                    onBackClick = { rootNavController.popBackStack() }
-                )
-            }
-        }
-    }
-}
-
-/** 设备模块的内嵌导航（保持现有列表→详情→编辑流程） */
-@Composable
-fun DeviceNavHost(onSettingsClick: () -> Unit) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "device_list") {
-        composable("device_list") {
-            ItemListScreen(
-                onItemClick = { id -> navController.navigate("device_detail/$id") },
-                onAddClick = { navController.navigate("device_add") },
-                onSettingsClick = onSettingsClick
-            )
-        }
-        composable("device_detail/{itemId}", arguments = listOf(navArgument("itemId") { type = NavType.LongType })) { entry ->
-            val id = entry.arguments?.getLong("itemId") ?: return@composable
-            ItemDetailScreen(
-                itemId = id,
-                onBackClick = { navController.popBackStack() },
-                onEditClick = { navController.navigate("device_edit/$id") },
-                onDeleted = { navController.popBackStack("device_list", false) }
-            )
-        }
-        composable(
-            "device_add?itemId={itemId}",
-            arguments = listOf(navArgument("itemId") { type = NavType.LongType; defaultValue = -1L })
-        ) { entry ->
-            val id = entry.arguments?.getLong("itemId") ?: -1L
-            AddEditItemScreen(
-                itemId = if (id == -1L) null else id,
-                onBackClick = { navController.popBackStack() },
-                onSaved = { navController.popBackStack() }
-            )
-        }
-        composable(
-            "device_edit/{itemId}",
-            arguments = listOf(navArgument("itemId") { type = NavType.LongType })
-        ) { entry ->
-            val id = entry.arguments?.getLong("itemId") ?: return@composable
-            AddEditItemScreen(
-                itemId = id,
-                onBackClick = { navController.popBackStack() },
-                onSaved = { navController.popBackStack() }
-            )
+            // === 设置 ===
+            composable("settings") { SettingsScreen(onBackClick = { navController.popBackStack() }) }
         }
     }
 }
